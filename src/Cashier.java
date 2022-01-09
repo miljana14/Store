@@ -17,7 +17,7 @@ public class Cashier {
         System.out.println("---Products---\n");
         double subtotal = 0;
         double discount = 0;
-        double total = 0;
+        double total;
         for (Map.Entry<Product, Double> obj: cart.entrySet()){
             Product key = obj.getKey();
             Double quantity = obj.getValue();
@@ -29,20 +29,20 @@ public class Cashier {
                 System.out.print(key.getName() + " - " + key.getBrand() + "\n" +
                         quantity + " x $" + key.getPrice() + " = $" + sumDecimal + "\n");
                 if (((PerishableProduct) key).getExpirationDate().equals(dateTime.toLocalDate())){
-                    ((PerishableProduct) key).setPrice(sum/2);
+                    key.setPrice(sum/2);
                     disc = key.getPrice();
                     sumDecimal = df.format(disc);
-                    System.out.println("#discount 50%" +" -$" +  df.format(((PerishableProduct)key).getPrice()) + "\n");
+                    System.out.println("#discount 50%" +" -$" +  df.format(key.getPrice()) + "\n");
                 }
                 else if ((dateTime.toLocalDate()).plusDays(5).equals(((PerishableProduct) key).getExpirationDate()) ||
                         (dateTime.toLocalDate()).plusDays(4).equals(((PerishableProduct) key).getExpirationDate()) ||
                         (dateTime.toLocalDate()).plusDays(3).equals(((PerishableProduct) key).getExpirationDate()) ||
                         (dateTime.toLocalDate()).plusDays(2).equals(((PerishableProduct) key).getExpirationDate()) ||
                         (dateTime.toLocalDate()).plusDays(1).equals(((PerishableProduct) key).getExpirationDate())){
-                    ((PerishableProduct) key).setPrice(sum*0.1);
+                    key.setPrice(sum*0.1);
                     disc = key.getPrice();
                     sumDecimal = df.format(disc);
-                    System.out.println("#discount 10%" +" -$" + df.format(((PerishableProduct)key).getPrice()) + "\n");
+                    System.out.println("#discount 10%" +" -$" + df.format(key.getPrice()) + "\n");
                 }
                 else {
                     System.out.println();
@@ -54,10 +54,10 @@ public class Cashier {
                         ((Clothes) key).getSize() + " " + ((Clothes) key).getColor() + "\n" +
                         quantity + " x $" + key.getPrice() + " = $" + sumDecimal + "\n");
                 if (!isWeekend(dateTime.toLocalDate())){
-                    ((Clothes) key).setPrice(sum*0.1);
+                    key.setPrice(sum*0.1);
                     disc = key.getPrice();
                     sumDecimal = df.format(disc);
-                    System.out.println("#discount 10%" +" -$" + df.format(((Clothes)key).getPrice()) + "\n");
+                    System.out.println("#discount 10%" +" -$" + df.format(key.getPrice()) + "\n");
                 }
                 else {
                     System.out.println();
@@ -66,11 +66,11 @@ public class Cashier {
             else if (key instanceof Appliance){
                 System.out.print(key.getName() + " - " + key.getBrand() + " " + ((Appliance) key).getModel() + "\n" +
                         quantity + " x $" + key.getPrice() + " = $" + sumDecimal + "\n");
-                if (isWeekend(dateTime.toLocalDate()) && ((Appliance)key).getPrice()>999){
-                    ((Appliance) key).setPrice(sum*0.05);
+                if (isWeekend(dateTime.toLocalDate()) && key.getPrice()>999){
+                    key.setPrice(sum*0.05);
                     disc = key.getPrice();
                     sumDecimal = df.format(disc);
-                    System.out.println("#discount 5%" +" -$" + df.format(((Appliance)key).getPrice()) + "\n");
+                    System.out.println("#discount 5%" +" -$" + df.format(key.getPrice()) + "\n");
                 }
                 else {
                     System.out.println();
@@ -91,6 +91,11 @@ public class Cashier {
         System.out.println("TOTAL:$" + tot);
     }
 
+    public static boolean isWeekend(LocalDate date) {
+        DayOfWeek day = DayOfWeek.of(date.get(ChronoField.DAY_OF_WEEK));
+        return day == DayOfWeek.SUNDAY || day == DayOfWeek.SATURDAY;
+    }
+
     public static void main(String[] args) {
         Map <Product, Double> map = new HashMap<>();
         map.put(new Food("apple","Brand A", 1.5, LocalDate.of(2021,06,14)), 2.45);
@@ -99,10 +104,4 @@ public class Cashier {
         map.put(new Appliance("Laptop","Brand L", 2345, "Model L", LocalDate.of(2021, 3, 3), 1.125), 1.0);
         printReceipt(map,LocalDateTime.of(2021,06,14,12,34,56));
     }
-
-    public static boolean isWeekend(LocalDate date) {
-        DayOfWeek day = DayOfWeek.of(date.get(ChronoField.DAY_OF_WEEK));
-        return day == DayOfWeek.SUNDAY || day == DayOfWeek.SATURDAY;
-    }
-
 }
